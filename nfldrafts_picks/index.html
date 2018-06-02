@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>NFL Draft History</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive Visualization of NFL Drafty History">
+    <meta name="author" content="Nanda Yadav">
+    <script src="js/d3.v3.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+    <script src="js/bootstrap-dropdown.js"></script>
+    <script src="js/bootstrap-button.js"></script>
+    <script src="js/colorbrewer.js"></script>
+    <script src="js/underscore-min.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/themes/base/jquery-ui.css" />
+    <link href="css/bootstrap-slider.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../assets/js/html5shiv.js"></script>
+    <![endif]-->
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-39481629-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+  </head>
+
+  <body>
+
+    <div class="container-narrow">
+
+      <div class="masthead">
+        <ul class="nav nav-pills pull-right">
+          <li><a href="#about">About</a></li>
+        </ul>
+        <h3 class="muted"> NFL Draft Picks</h3>
+      </div>
+
+      <hr>
+      
+      <div class="row">
+        <div class="btn-group span2" style="padding-top: 0px; width: 200px;">
+          <button class="btn btn-success" id="selected">Pick your team</button>
+          <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#" data-team="rams">Los Angeles Rams</a></li>
+            <li><a href="#" data-team="packers">Greenbay Packers</a></li>
+            <li><a href="#" data-team="bears">Chicago Bears</a></li>
+            <li><a href="#" data-team="lions">Detroit Lions</a></li>
+            <li><a href="#" data-team="falcons">Atlanta Falcons</a></li>
+            <li><a href="#" data-team="panthers">Carolina Panthers</a></li>
+            <li><a href="#" data-team="cardinals">Arizona Cardinals</a></li>
+            <li><a href="#" data-team="ravens">Baltimore Ravens</a></li>
+            <li><a href="#" data-team="bills">Buffalo Bills</a></li>
+            <li><a href="#" data-team="bengals">Cincinatti Bengals</a></li>
+            <li><a href="#" data-team="browns">Cleveland Browns</a></li>
+            <li><a href="#" data-team="broncos">Denver Broncos</a></li>
+            <li><a href="#" data-team="texans">Houston Texans</a></li>
+            <li><a href="#" data-team="colts">Indianapolis Colts</a></li>
+            <li><a href="#" data-team="jaguars">Jacksonville Jaguars</a></li>
+            <li><a href="#" data-team="cowboys">Dallas Cowboys</a></li>
+            <li><a href="#" data-team="patriots">New England Patriots</a></li>
+            <li><a href="#" data-team="redskins">Washington Redskins</a></li>
+            <li><a href="#" data-team="titans">Tennessee Titans</a></li>
+            <li><a href="#" data-team="bucs">Tampa Bay Buccaneers</a></li>
+            <li><a href="#" data-team="vikings">Minnesota Vikings</a></li>
+            <li><a href="#" data-team="seahawks">Seattle Seahawks</a></li>
+            <li><a href="#" data-team="49ers">San Francisco 49ers</a></li>
+            <li><a href="#" data-team="chargers">Los Angeles Chargers</a></li>
+            <li><a href="#" data-team="steelers">Pittsburgh Steelers</a></li>
+            <li><a href="#" data-team="eagles">Philadelphia Eagles</a></li>
+            <li><a href="#" data-team="raiders">Oakland Raiders</a></li>
+            <li><a href="#" data-team="jets">New York Jets</a></li>
+            <li><a href="#" data-team="giants">New York Giants</a></li>
+            <li><a href="#" data-team="saints">New Orleans Saints</a></li>
+            <li><a href="#" data-team="dolphins">Miami Dolphins</a></li>
+            <li><a href="#" data-team="chiefs">Kansas City Chiefs</a></li>
+          </ul>
+        </div>
+        <div class="span1" id="logo" style="display: none;">
+          <img src="logos/rams.gif" width="48" height="48">
+        </div>
+        <div class="span2" id="info">
+          <p></p>
+        </div>
+        <div class="span7 pull-right">
+          <span class="label label-info">Visualization Type </span>
+          <label class="radio inline">
+            <input type="radio" id="individual" name="VizMode" value="individual" checked="true">Individual
+          </label>
+          <label class="radio inline">
+            <input type="radio" id="heatmap" name="VizMode" value="heatmap">Heatmap
+          </label>
+        </div>
+      </row>
+      <row class="span12 well" id="decade-filter" style="display: none; padding: 4px; margin-top: 10px;">
+        <div class="span4" style="margin-top: 6px;">
+          <span class="label label-info">Filter by Decade</span><span>&nbsp; or manually slide year filter</span>
+        </div>
+        <div class="span7">
+          <ul class="nav nav-pills" id="decade-links">
+          </ul>
+        </div>
+        <div class="row" id="sliderContainer" style="display: none; padding-bottom: 10px;">
+          <div class="span1" id="start"><span class="badge badge-large badge-success"></span></div>
+          <div id="slider" class="span10"></div>
+          <div class="span1" id="end"><span class="badge badge-success"></span></div>
+        </div>
+      </row>
+      <row class="span12 well" id="round-filter" style="padding: 4px; margin-top: 10px;">
+        <div class="span3" style="margin-top: 6px;">
+          <span class="label label-info">Filter by</span>
+          <div class="btn-group" data-toggle="buttons-radio" style="margin: 0px 5px;">
+            <button class="btn btn-small active">Round</button>
+            <button class="btn btn-small">Position</button>
+          </div>
+        </div>
+        <div class="span9">
+          <ul class="nav nav-pills" id="round-links">
+            <li class="active"><a href="#all">All</a></li>
+            <li><a href="#1">1</a></li>
+            <li><a href="#2">2</a></li>
+            <li><a href="#3">3</a></li>
+            <li><a href="#4">4</a></li>
+            <li><a href="#5">5</a></li>
+            <li><a href="#6">6</a></li>
+            <li><a href="#7">7</a></li>
+            <li><a href="#8">8 and above</a></li>
+          </ul>
+          <ul class="nav nav-pills" id="position-links" style="display: none;">
+            <li class="active"><a href="#all">All</a></li>
+            <li><a href="#">QB</a></li>
+            <li><a href="#">RB</a></li>
+            <li><a href="#">WR</a></li>
+            <li><a href="#">TE</a></li>
+            <li><a href="#">G</a></li>
+            <li><a href="#">C</a></li>
+            <li><a href="#">T</a></li>
+            <li><a href="#">K</a></li>
+            <li><a href="#">P</a></li>
+            <li><a href="#">DB</a></li>
+            <li><a href="#">CB</a></li>
+            <li><a href="#">LB</a></li>
+            <li><a href="#">FS</a></li>
+            <li><a href="#">DT</a></li>
+            <li><a href="#">DE</a></li>
+          </ul>
+        </div>
+      </div>
+
+      
+      
+      <div id="chart"></div>
+      <script src="js/line.js"></script>
+      <br/>
+      <div id="about" class="well">
+        <h3>About</h3>
+        <p>This project is made to display all the draft picks for each time from the beginning of the draft era till today </p>
+        <h4>Graph</h4>
+        <p>This graph shows all the draft picks grouped by year, color coded by round. This can be further filtered by a round or a players position.</p>
+        <h4>Heatmap</h4>
+        <p>The heatmap chart shows how individual positions drafted for compare to each other, as displayed by darkness of the color, over range of years. You can filter this by a certain decade or any starting and ending years using the year slider. </p>
+        <h4>Data Messaging/Conversion</h4>
+        
+        </ul> 
+        <p>Data Source: <a href="http://www.pro-football-reference.com/" target="_blank">Pro-Football-reference.com</a><br/>
+               <a href="https://github.com/richb819/Project2" target="_blank">Source Code</a>
+        </p>
+        
+      
+               
+      </div>
+      
+      
+    </div> <!-- /container -->
+    
+  </body>
+</html>
